@@ -1,1 +1,1 @@
-web: trash-snake
+web: ./trash-snake
