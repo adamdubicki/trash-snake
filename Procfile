@@ -1,1 +1,1 @@
-web: ./trash-snake
+web: go build . && ./trash-snake
