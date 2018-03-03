@@ -101,7 +101,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	// fmt.Println("---------------------")
 
 	if bm.GameBoard.tileInBounds(foodResult) {
-		// fmt.Println("WENT FOR FOOD")
 		currentMove = getDirection(bm.Req.You.Head(), foodResult)
 	} else if bm.GameBoard.tileInBounds(tailResult) {
 		// fmt.Println("WENT FOR TAIL")
