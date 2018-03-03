@@ -100,10 +100,10 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	// fmt.Println("---------------------")
 
-	if !bm.GameBoard.getTile(foodResult).Dangerous && bm.GameBoard.tileInBounds(foodResult) {
+	if bm.GameBoard.tileInBounds(foodResult) {
 		// fmt.Println("WENT FOR FOOD")
 		currentMove = getDirection(bm.Req.You.Head(), foodResult)
-	} else if !bm.GameBoard.getTile(tailResult).Dangerous && bm.GameBoard.tileInBounds(tailResult) {
+	} else if bm.GameBoard.tileInBounds(tailResult) {
 		// fmt.Println("WENT FOR TAIL")
 		currentMove = getDirection(bm.Req.You.Head(), tailResult)
 	} else if optimalResult != NO_MOVE {
