@@ -15,10 +15,11 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 	respond(res, StartResponse{
 		Color:          "orange",
 		Name:           "trash-snake",
-		Taunt:          "I eat garbage.",
+		Taunt:          "ITS MY CHARACTER! I'M THE TRASH SNAKE!",
 		HeadType:       HEAD_SAND_WORM,
 		TailType:       TAIL_FRECKLED,
 		SecondaryColor: "pink",
+		HeadURL:        "http://dubickisnake.herokuapp.com/static/devito.png",
 	})
 }
 
@@ -51,6 +52,9 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
+				if len(foodPath) > 5 && bm.Req.You.Health > (len(foodPath)+foodResult.Differential) {
+					foodPath = extendPath(foodPath, *bm.GameBoard, foodResult.Differential)
+				}
 				foodMove = foodPath[1]
 			}
 		}
@@ -66,7 +70,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			if len(tailPath) == 2 && bm.Req.You.Health > 99 {
 				tailMove = Point{-1, -1}
 			} else {
-				if len(bm.Req.You.Body) > len(tailPath) {
+				if bm.Req.Turn > 5 {
 					extendPath := extendPath(tailPath, *bm.GameBoard, 15)
 					tailMove = extendPath[1]
 				} else {
