@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 func toStringPointer(str string) *string {
 	return &str
@@ -45,7 +47,7 @@ func projectSnakeAlongPath(path []Point, snake Snake) []Point {
 	if len(path) < len(snake.Body) {
 		p := make([]Point, 0)
 		p = append(p, path[:len(path)]...)
-		p = append(p, snake.Body[:(len(snake.Body)-len(path))]...)
+		p = append(p, snake.Body[:(len(snake.Body)-len(path))+1]...)
 		return p
 	} else if len(path) > len(snake.Body) {
 		return path[:len(snake.Body)]
@@ -73,7 +75,6 @@ func pathIsSafe(path []Point, ourSnake Snake, b *Board) bool {
 	fakeTail := projected[len(projected)-1]
 	copy.insert(fakeHead, snakeHead())
 	copy.insert(fakeTail, empty())
-	// copy.show()
 
 	pathToTail := shortestPath(fakeHead, fakeTail, copy)
 	if len(pathToTail) > 2 {
@@ -155,17 +156,17 @@ func shortestPath(start Point, goal Point, board *Board) []Point {
 	openSet := make([]Point, 0)      // Tiles to explore
 	openSet = append(openSet, start) // Start exploring from start tile
 
-	gScore := make(map[Point]int) // Shortest path distance
-	fScore := make(map[Point]int) // Manhatten distance heuristic
+	gScore := make(map[Point]float32) // Shortest path distance
+	fScore := make(map[Point]float32) // Manhatten distance heuristic
 	cameFrom := make(map[Point]Point)
 	for i := 0; i < board.Width; i++ {
 		for j := 0; j < board.Height; j++ {
-			gScore[Point{i, j}] = 1000
-			fScore[Point{i, j}] = 1000
+			gScore[Point{i, j}] = 1000.0
+			fScore[Point{i, j}] = 1000.0
 		}
 	}
 	gScore[start] = 0
-	fScore[start] = distance(start, goal)
+	fScore[start] = float32(distance(start, goal))
 
 	// While there are still tiles to explore
 	for len(openSet) > 0 {
@@ -195,7 +196,7 @@ func shortestPath(start Point, goal Point, board *Board) []Point {
 				continue
 			}
 
-			tentativeGScore := gScore[min] + distance(min, n)
+			tentativeGScore := gScore[min] + float32(distance(min, n))
 
 			if !pointInSet(n, openSet) {
 				openSet = append(openSet, n)
@@ -205,7 +206,15 @@ func shortestPath(start Point, goal Point, board *Board) []Point {
 
 			cameFrom[n] = min
 			gScore[n] = tentativeGScore
-			fScore[n] = tentativeGScore + distance(n, min)
+
+			var bonus float32
+			if board.getTile(n).EntityType == EMPTY {
+				bonus = -0.1
+			} else {
+				bonus = 0.0
+			}
+
+			fScore[n] = tentativeGScore + float32(distance(n, min)) + bonus
 		}
 	}
 
@@ -224,4 +233,39 @@ func Round(val float64, roundOn float64, places int) (newVal float64) {
 	}
 	newVal = round / pow
 	return
+}
+
+func getKillIncentive(direction string, head Point) []Point {
+	switch direction {
+	case UP:
+		return []Point{
+			Point{head.X - 1, head.Y - 1},
+			Point{head.X, head.Y - 1},
+			Point{head.X + 1, head.Y - 1},
+		}
+	case LEFT:
+		return []Point{
+			Point{head.X - 1, head.Y - 1},
+			Point{head.X - 1, head.Y},
+			Point{head.X - 1, head.Y + 1},
+		}
+	case DOWN:
+		return []Point{
+			Point{head.X - 1, head.Y + 1},
+			Point{head.X, head.Y + 1},
+			Point{head.X + 1, head.Y + 1},
+		}
+	case RIGHT:
+		return []Point{
+			Point{head.X + 1, head.Y - 1},
+			Point{head.X + 1, head.Y},
+			Point{head.X + 1, head.Y + 1},
+		}
+	default:
+		return []Point{
+			Point{head.X - 1, head.Y - 1},
+			Point{head.X, head.Y - 1},
+			Point{head.X + 1, head.Y - 1},
+		}
+	}
 }
