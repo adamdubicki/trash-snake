@@ -13,9 +13,9 @@ func respond(res http.ResponseWriter, obj interface{}) {
 
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	respond(res, StartResponse{
-		Color:          "black",
+		Color:          "orange",
 		Name:           "trash-snake",
-		Taunt:          "Yoooo",
+		Taunt:          "I eat garbage.",
 		HeadType:       HEAD_SAND_WORM,
 		TailType:       TAIL_FRECKLED,
 		SecondaryColor: "pink",
