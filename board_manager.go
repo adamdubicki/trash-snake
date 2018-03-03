@@ -58,16 +58,7 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 			ourHead = snake.Head()
 		} else {
 			if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
-				potential := []Point{
-					Point{snake.Head().X - 1, snake.Head().Y},
-					Point{snake.Head().X + 1, snake.Head().Y},
-					Point{snake.Head().X, snake.Head().Y - 1},
-					Point{snake.Head().X, snake.Head().Y + 1},
-					Point{snake.Head().X - 1, snake.Head().Y - 1},
-					Point{snake.Head().X + 1, snake.Head().Y + 1},
-					Point{snake.Head().X - 1, snake.Head().Y + 1},
-					Point{snake.Head().X + 1, snake.Head().Y - 1},
-				}
+				potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
 				for k, p := range potential {
 					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
 						bm.GameBoard.insert(p, obstacle())
@@ -80,11 +71,11 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 				potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
 				bm.GameBoard.insert(snake.Head(), obstacle())
 				bm.Req.Food = append(bm.Req.Food, snake.Head())
-				for k, p := range potential {
+				for _, p := range potential {
 					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
 						bm.GameBoard.insert(p, food())
-						if pointInSet(p, bm.Req.Food) {
-							bm.Req.Food = append(bm.Req.Food[:k], bm.Req.Food[k+1:]...)
+						if !pointInSet(p, bm.Req.Food) {
+							bm.Req.Food = append(bm.Req.Food, p)
 						}
 					}
 				}
