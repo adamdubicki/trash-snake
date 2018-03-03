@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
+	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -42,21 +42,15 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	var foodResult string
 	var tailResult string
 	var optimalResult string
-	// start := time.Now()
+	start := time.Now()
+	fmt.Println(bm.Req.Food)
 
 	go func() {
-		var thresh int
-		if float64(len(bm.Req.You.Body)) < bm.avgSnakeLength()-1 {
-			thresh = 1000
-		} else {
-			thresh = int(math.Hypot(float64(bm.GameBoard.Width), float64(bm.GameBoard.Height)))
-		}
-
 		foodMove := NO_MOVE
 		food := bm.findBestFood()
 		if food.X != -1 {
 			foodPath := shortestPath(bm.OurHead, food, bm.GameBoard)
-			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) && bm.Req.You.Health < (len(foodPath)+thresh) {
+			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
 				foodMove = getDirection(foodPath[0], foodPath[1])
 			}
@@ -70,7 +64,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		copy.insert(bm.Req.You.Tail(), food())
 		tailPath := shortestPath(bm.OurHead, bm.Req.You.Tail(), copy)
 		if len(tailPath) >= 2 {
-			if len(tailPath) == 2 && bm.Req.You.Health > 98 {
+			if len(tailPath) == 2 && bm.Req.You.Health > 99 {
 				tailMove = NO_MOVE
 			} else {
 				if len(bm.Req.You.Body) > len(tailPath) {
@@ -90,21 +84,21 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		optimalChannel <- root.getOptimalMove()
 	}()
 
-	// fmt.Println("---------------------")
+	fmt.Println("---------------------")
 	for i := 0; i < 3; i++ {
 		select {
 		case foodResult = <-foodChannel:
-			// fmt.Println("Food Result:", foodResult, time.Since(start))
+			fmt.Println("Food Result:", foodResult, time.Since(start))
 			continue
 		case tailResult = <-tailChannel:
-			// fmt.Println("Tail Result:", tailResult, time.Since(start))
+			fmt.Println("Tail Result:", tailResult, time.Since(start))
 			continue
 		case optimalResult = <-optimalChannel:
-			// fmt.Println("Optimal Result:", optimalResult, time.Since(start))
+			fmt.Println("Optimal Result:", optimalResult, time.Since(start))
 			continue
 		}
 	}
-	// fmt.Println("---------------------")
+	fmt.Println("---------------------")
 
 	if foodResult != NO_MOVE {
 		currentMove = foodResult

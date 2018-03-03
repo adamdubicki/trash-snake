@@ -99,7 +99,7 @@ func (bm BoardManager) findBestFood() Point {
 			for _, snake := range bm.Req.Snakes {
 				_, exists := best[food]
 				if exists == true {
-					if distance(best[food], food) > distance(snake.Head(), food) {
+					if distance(best[food], food) > distance(snake.Head(), food) && (best[food] != food) {
 						best[food] = snake.Head()
 					}
 				} else {
