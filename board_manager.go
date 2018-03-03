@@ -57,7 +57,7 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 			bm.GameBoard.insert(snake.Head(), snakeHead())
 			ourHead = snake.Head()
 		} else {
-			if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
+			if snake.Length >= bm.Req.You.Length {
 				potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
 				for k, p := range potential {
 					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {

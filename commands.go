@@ -19,6 +19,7 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 		HeadType:       HEAD_SAND_WORM,
 		TailType:       TAIL_FRECKLED,
 		SecondaryColor: "pink",
+		HeadURL:        "https://trash-snake.herokuapp.com/static/devito.png",
 	})
 }
 
@@ -99,14 +100,21 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	// fmt.Println("---------------------")
 
+	// fmt.Println(foodResult)
 	if bm.GameBoard.tileInBounds(foodResult) {
 		currentMove = getDirection(bm.Req.You.Head(), foodResult)
-	} else if bm.GameBoard.tileInBounds(tailResult) {
-		// fmt.Println("WENT FOR TAIL")
+	} else if bm.GameBoard.tileInBounds(tailResult) && bm.Req.Turn > 3 {
 		currentMove = getDirection(bm.Req.You.Head(), tailResult)
 	} else if optimalResult != NO_MOVE {
 		// fmt.Println("WENT FOR OPTIMAL")
 		currentMove = optimalResult
+	} else {
+		neighbours := bm.GameBoard.getValidTiles(bm.Req.You.Head())
+		if len(neighbours) > 0 {
+			currentMove = getDirection(bm.Req.You.Head(), neighbours[0])
+		} else {
+			currentMove = UP
+		}
 	}
 
 	respond(res, MoveResponse{

@@ -34,7 +34,7 @@ func (m MinMax) getOptimalMove() string {
 			}
 		}
 	} else {
-		move = UP
+		move = NO_MOVE
 	}
 
 	return move
