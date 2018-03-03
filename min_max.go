@@ -15,7 +15,7 @@ func createRoot(req *MoveRequest) MinMax {
 		root.Snakes[snake.ID] = newBody
 	}
 	root.Height = req.Height
-	root.Width = req.Height
+	root.Width = req.Width
 	return root
 }
 
@@ -25,12 +25,11 @@ func (m MinMax) getOptimalMove() string {
 	if len(permutations) > 0 {
 		score := permutations[0].recursiveScore(1)
 		move = permutations[0].direction(m.YouID)
-		// fmt.Println("BEST score", score)
 		for _, k := range permutations {
 			recursiveScore := k.recursiveScore(1)
 			if score < recursiveScore {
 				score = recursiveScore
-				// fmt.Println("BEST score", score)
+				// fmt.Println("BEST score", score
 				move = k.direction(m.YouID)
 			}
 		}

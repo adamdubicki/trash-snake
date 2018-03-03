@@ -43,7 +43,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	var optimalResult string
 
 	// start := time.Now()
-
+	// bm.GameBoard.show()
 	go func() {
 		foodMove := Point{-1, -1}
 		foodResult := bm.findBestFood()
@@ -51,9 +51,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
-				if len(foodPath) > 5 && bm.Req.You.Health > (len(foodPath)+foodResult.Differential-5) {
-					foodPath = extendPath(foodPath, *bm.GameBoard, foodResult.Differential-1)
-				}
 				foodMove = foodPath[1]
 			}
 		}
@@ -102,10 +99,10 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	// fmt.Println("---------------------")
 
-	if !bm.GameBoard.getTile(foodResult).Dangerous {
+	if !bm.GameBoard.getTile(foodResult).Dangerous && bm.GameBoard.tileInBounds(foodResult) {
 		// fmt.Println("WENT FOR FOOD")
 		currentMove = getDirection(bm.Req.You.Head(), foodResult)
-	} else if !bm.GameBoard.getTile(tailResult).Dangerous {
+	} else if !bm.GameBoard.getTile(tailResult).Dangerous && bm.GameBoard.tileInBounds(tailResult) {
 		// fmt.Println("WENT FOR TAIL")
 		currentMove = getDirection(bm.Req.You.Head(), tailResult)
 	} else if optimalResult != NO_MOVE {
