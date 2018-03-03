@@ -51,6 +51,9 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
+				if len(foodPath) > 5 && bm.Req.You.Health > (len(foodPath)+foodResult.Differential-5) {
+					foodPath = extendPath(foodPath, *bm.GameBoard, foodResult.Differential-1)
+				}
 				foodMove = foodPath[1]
 			}
 		}
@@ -87,10 +90,10 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	for i := 0; i < 3; i++ {
 		select {
 		case foodResult = <-foodChannel:
-			// fmt.Println("Food Result:", foodResult, time.Since(start))
+			// fmt.Println("Food Result:", getDirection(bm.Req.You.Head(), foodResult), time.Since(start))
 			continue
 		case tailResult = <-tailChannel:
-			// fmt.Println("Tail Result:", tailResult, time.Since(start))
+			// fmt.Println("Tail Result:", getDirection(bm.Req.You.Head(), tailResult), time.Since(start))
 			continue
 		case optimalResult = <-optimalChannel:
 			// fmt.Println("Optimal Result:", optimalResult, time.Since(start))
