@@ -57,7 +57,7 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 			bm.GameBoard.insert(snake.Head(), snakeHead())
 			ourHead = snake.Head()
 		} else {
-			if distance(snake.Head(), bm.Req.You.Head()) < 5 {
+			if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
 				potential := []Point{
 					Point{snake.Head().X - 1, snake.Head().Y},
 					Point{snake.Head().X + 1, snake.Head().Y},
@@ -68,11 +68,17 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 					Point{snake.Head().X - 1, snake.Head().Y + 1},
 					Point{snake.Head().X + 1, snake.Head().Y - 1},
 				}
-				for _, p := range potential {
-					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType == EMPTY {
+				for k, p := range potential {
+					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
 						bm.GameBoard.insert(p, obstacle())
+						if pointInSet(p, bm.Req.Food) {
+							bm.Req.Food = append(bm.Req.Food[:k], bm.Req.Food[k+1:]...)
+						}
 					}
 				}
+			} else {
+				bm.GameBoard.insert(snake.Head(), food())
+				bm.Req.Food = append(bm.Req.Food, snake.Head())
 			}
 		}
 
@@ -87,9 +93,7 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 // Find the best food, the one we are closest
 // to compared to all other snakes
 func (bm BoardManager) findBestFood() Point {
-
 	best := make(map[Point]Point)
-
 	for _, food := range bm.Req.Food {
 		if distance(food, bm.OurHead) < bm.Req.You.Health {
 			for _, snake := range bm.Req.Snakes {
