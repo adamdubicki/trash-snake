@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -42,7 +41,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	var foodResult string
 	var tailResult string
 	var optimalResult string
-	start := time.Now()
 	// fmt.Println(bm.Req.Food)
 
 	go func() {
