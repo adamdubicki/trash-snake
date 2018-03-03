@@ -73,9 +73,10 @@ func pathIsSafe(path []Point, ourSnake Snake, b *Board) bool {
 	fakeTail := projected[len(projected)-1]
 	copy.insert(fakeHead, snakeHead())
 	copy.insert(fakeTail, empty())
+	// copy.show()
 
 	pathToTail := shortestPath(fakeHead, fakeTail, copy)
-	if len(pathToTail) >= 2 {
+	if len(pathToTail) > 2 {
 		return true
 	}
 

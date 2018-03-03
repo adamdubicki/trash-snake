@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -42,8 +41,8 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	var foodResult string
 	var tailResult string
 	var optimalResult string
-	start := time.Now()
-	fmt.Println(bm.Req.Food)
+	// start := time.Now()
+	// fmt.Println(bm.Req.Food)
 
 	go func() {
 		foodMove := NO_MOVE
@@ -84,21 +83,21 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 		optimalChannel <- root.getOptimalMove()
 	}()
 
-	fmt.Println("---------------------")
+	// fmt.Println("---------------------")
 	for i := 0; i < 3; i++ {
 		select {
 		case foodResult = <-foodChannel:
-			fmt.Println("Food Result:", foodResult, time.Since(start))
+			// fmt.Println("Food Result:", foodResult, time.Since(start))
 			continue
 		case tailResult = <-tailChannel:
-			fmt.Println("Tail Result:", tailResult, time.Since(start))
+			// fmt.Println("Tail Result:", tailResult, time.Since(start))
 			continue
 		case optimalResult = <-optimalChannel:
-			fmt.Println("Optimal Result:", optimalResult, time.Since(start))
+			// fmt.Println("Optimal Result:", optimalResult, time.Since(start))
 			continue
 		}
 	}
-	fmt.Println("---------------------")
+	// fmt.Println("---------------------")
 
 	if foodResult != NO_MOVE {
 		currentMove = foodResult
