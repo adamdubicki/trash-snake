@@ -19,7 +19,7 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 		HeadType:       HEAD_SAND_WORM,
 		TailType:       TAIL_FRECKLED,
 		SecondaryColor: "pink",
-		HeadURL:        "https://trash-snake.herokuapp.com/static/devito.png",
+		HeadURL:        "https://pbs.twimg.com/profile_images/535222646963572736/KZItD1f-_400x400.png",
 	})
 }
 
