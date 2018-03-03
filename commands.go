@@ -19,7 +19,6 @@ func handleStart(res http.ResponseWriter, req *http.Request) {
 		HeadType:       HEAD_SAND_WORM,
 		TailType:       TAIL_FRECKLED,
 		SecondaryColor: "pink",
-		HeadURL:        "http://dubickisnake.herokuapp.com/static/devito.png",
 	})
 }
 
