@@ -52,9 +52,6 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
-				if len(foodPath) > 5 && bm.Req.You.Health > (len(foodPath)+foodResult.Differential) {
-					foodPath = extendPath(foodPath, *bm.GameBoard, foodResult.Differential)
-				}
 				foodMove = foodPath[1]
 			}
 		}
