@@ -115,7 +115,7 @@ func pointIsValidExtension(p Point, board Board, path []Point) bool {
 	return !board.getTile(p).Dangerous && !pointInSet(p, path)
 }
 
-func extendPath(path []Point, board Board) []Point {
+func extendPath(path []Point, board Board, limit int) []Point {
 	extended := make([]Point, 0)
 	extended = append(extended, path...)
 	for i := 0; i < len(extended)-1; i++ {
@@ -143,7 +143,7 @@ func extendPath(path []Point, board Board) []Point {
 				extended = append(extended[0:i+1], append([]Point{currentRight, nextRight}, extended[i+1:]...)...)
 			}
 		}
-		if i == len(extended)-1 || len(extended) > 15 {
+		if i == len(extended)-1 || len(extended) > limit {
 			continue
 		}
 	}

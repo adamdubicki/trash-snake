@@ -34,42 +34,43 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	bm := initializeBoard(data)
 
-	foodChannel := make(chan string)
-	tailChannel := make(chan string)
+	foodChannel := make(chan Point)
+	tailChannel := make(chan Point)
 	optimalChannel := make(chan string)
 
-	var foodResult string
-	var tailResult string
+	var foodResult Point
+	var tailResult Point
 	var optimalResult string
-	// fmt.Println(bm.Req.Food)
+
+	// start := time.Now()
 
 	go func() {
-		foodMove := NO_MOVE
-		food := bm.findBestFood()
-		if food.X != -1 {
-			foodPath := shortestPath(bm.OurHead, food, bm.GameBoard)
+		foodMove := Point{-1, -1}
+		foodResult := bm.findBestFood()
+		if foodResult.Food.X != -1 {
+			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 			if len(foodPath) >= 2 && pathIsSafe(foodPath, bm.Req.You, bm.GameBoard) {
 				foodPath = reverseList(foodPath)
-				foodMove = getDirection(foodPath[0], foodPath[1])
+				foodMove = foodPath[1]
 			}
 		}
 		foodChannel <- foodMove
 	}()
 
 	go func() {
-		tailMove := NO_MOVE
+		tailMove := Point{-1, -1}
 		copy := bm.GameBoard.copy()
 		copy.insert(bm.Req.You.Tail(), food())
 		tailPath := shortestPath(bm.OurHead, bm.Req.You.Tail(), copy)
 		if len(tailPath) >= 2 {
 			if len(tailPath) == 2 && bm.Req.You.Health > 99 {
-				tailMove = NO_MOVE
+				tailMove = Point{-1, -1}
 			} else {
 				if len(bm.Req.You.Body) > len(tailPath) {
-					extendPath := extendPath(tailPath, *bm.GameBoard)
-					tailMove = getDirection(extendPath[0], extendPath[1])
+					extendPath := extendPath(tailPath, *bm.GameBoard, 15)
+					tailMove = extendPath[1]
 				} else {
-					tailMove = getDirection(tailPath[0], tailPath[1])
+					tailMove = tailPath[1]
 				}
 			}
 		}
@@ -98,11 +99,14 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	// fmt.Println("---------------------")
 
-	if foodResult != NO_MOVE {
-		currentMove = foodResult
-	} else if tailResult != NO_MOVE {
-		currentMove = tailResult
+	if !bm.GameBoard.getTile(foodResult).Dangerous {
+		// fmt.Println("WENT FOR FOOD")
+		currentMove = getDirection(bm.Req.You.Head(), foodResult)
+	} else if !bm.GameBoard.getTile(tailResult).Dangerous {
+		// fmt.Println("WENT FOR TAIL")
+		currentMove = getDirection(bm.Req.You.Head(), tailResult)
 	} else if optimalResult != NO_MOVE {
+		// fmt.Println("WENT FOR OPTIMAL")
 		currentMove = optimalResult
 	}
 

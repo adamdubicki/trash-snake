@@ -90,10 +90,16 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 	return ourHead
 }
 
+type BestFoodResult struct {
+	Differential int
+	Food         Point
+}
+
 // Find the best food, the one we are closest
 // to compared to all other snakes
-func (bm BoardManager) findBestFood() Point {
+func (bm BoardManager) findBestFood() BestFoodResult {
 	best := make(map[Point]Point)
+	differential := make(map[Point]int) // how much closer the person is than all other snakes
 	for _, food := range bm.Req.Food {
 		if distance(food, bm.OurHead) < bm.Req.You.Health {
 			for _, snake := range bm.Req.Snakes {
@@ -101,22 +107,26 @@ func (bm BoardManager) findBestFood() Point {
 				if exists == true {
 					if distance(best[food], food) > distance(snake.Head(), food) && (best[food] != food) {
 						best[food] = snake.Head()
+						differential[food] = distance(best[food], food) - distance(snake.Head(), food)
 					}
 				} else {
 					best[food] = snake.Head()
+					differential[food] = 1
 				}
 			}
 		}
 	}
 
-	bestFood := Point{-1, -1}
+	bestFood := BestFoodResult{0, Point{-1, -1}}
 	for food := range best {
 		if best[food] == bm.OurHead {
-			if bestFood.X == -1 {
-				bestFood = food
+			if bestFood.Food.X == -1 {
+				bestFood.Food = food
+				bestFood.Differential = differential[food]
 			} else {
-				if distance(bestFood, bm.OurHead) > distance(food, bm.OurHead) {
-					bestFood = food
+				if distance(bestFood.Food, bm.OurHead) > distance(food, bm.OurHead) {
+					bestFood.Food = food
+					bestFood.Differential = differential[food]
 				}
 			}
 		}
