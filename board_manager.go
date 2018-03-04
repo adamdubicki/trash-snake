@@ -57,25 +57,29 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 			bm.GameBoard.insert(snake.Head(), snakeHead())
 			ourHead = snake.Head()
 		} else {
-			if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
-				potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
-				for k, p := range potential {
-					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
-						bm.GameBoard.insert(p, obstacle())
-						if pointInSet(p, bm.Req.Food) && len(bm.Req.Food) > 1 {
-							bm.Req.Food = append(bm.Req.Food[:k], bm.Req.Food[k+1:]...)
+			if snake.Length > 2 {
+				if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
+					potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
+					for k, p := range potential {
+						if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
+							bm.GameBoard.insert(p, obstacle())
+							if pointInSet(p, bm.Req.Food) && len(bm.Req.Food) > 1 {
+								bm.Req.Food = append(bm.Req.Food[:k], bm.Req.Food[k+1:]...)
+							}
 						}
 					}
 				}
 			} else {
-				potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
-				bm.GameBoard.insert(snake.Head(), obstacle())
-				bm.Req.Food = append(bm.Req.Food, snake.Head())
-				for _, p := range potential {
-					if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType == EMPTY {
-						bm.GameBoard.insert(p, food())
-						if !pointInSet(p, bm.Req.Food) {
-							bm.Req.Food = append(bm.Req.Food, p)
+				if snake.Length > 2 {
+					potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
+					bm.GameBoard.insert(snake.Head(), obstacle())
+					bm.Req.Food = append(bm.Req.Food, snake.Head())
+					for _, p := range potential {
+						if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType == EMPTY {
+							bm.GameBoard.insert(p, food())
+							if !pointInSet(p, bm.Req.Food) {
+								bm.Req.Food = append(bm.Req.Food, p)
+							}
 						}
 					}
 				}
