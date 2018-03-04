@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 func respond(res http.ResponseWriter, obj interface{}) {
@@ -44,7 +43,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	var tailResult Point
 	var optimalResult string
 
-	start := time.Now()
+	// start := time.Now()
 	// bm.GameBoard.show()
 	go func() {
 		foodMove := Point{-1, -1}
@@ -101,13 +100,13 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	for i := 0; i < 3; i++ {
 		select {
 		case foodResult = <-foodChannel:
-			fmt.Println("Food Result:", getDirection(bm.Req.You.Head(), foodResult), time.Since(start))
+			// fmt.Println("Food Result:", getDirection(bm.Req.You.Head(), foodResult), time.Since(start))
 			continue
 		case tailResult = <-tailChannel:
-			fmt.Println("Tail Result:", getDirection(bm.Req.You.Head(), tailResult), time.Since(start))
+			// fmt.Println("Tail Result:", getDirection(bm.Req.You.Head(), tailResult), time.Since(start))
 			continue
 		case optimalResult = <-optimalChannel:
-			fmt.Println("Optimal Result:", optimalResult, time.Since(start))
+			// fmt.Println("Optimal Result:", optimalResult, time.Since(start))
 			continue
 		}
 	}
@@ -123,7 +122,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	} else {
 		neighbours := bm.GameBoard.getValidTiles(bm.Req.You.Head())
 		if len(neighbours) > 0 {
-			fmt.Println(neighbours)
+			// fmt.Println(neighbours)
 			currentMove = getDirection(bm.Req.You.Head(), neighbours[0])
 		} else {
 			currentMove = UP
