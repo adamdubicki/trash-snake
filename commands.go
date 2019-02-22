@@ -35,31 +35,31 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}
 	bm := initializeBoard(data)
 
-	foodChannel := make(chan Point)
-	tailChannel := make(chan Point)
+	foodChannel := make(chan Coord)
+	tailChannel := make(chan Coord)
 	optimalChannel := make(chan string)
 
-	var foodResult Point
-	var tailResult Point
+	var foodResult Coord
+	var tailResult Coord
 	var optimalResult string
 
 	// start := time.Now()
 	// bm.GameBoard.show()
 	go func() {
-		foodMove := Point{-1, -1}
+		foodMove := Coord{-1, -1}
 		foodResult := bm.findBestFood()
 		if foodResult.Food.X != -1 {
 			foodPath := shortestPath(bm.OurHead, foodResult.Food, bm.GameBoard)
 
 			var pathIsSafeCheck bool
-			if bm.Req.You.Length <= 2 {
+			if len(bm.Req.You.Body) <= 2 {
 				pathIsSafeCheck = true
 			} else {
 				pathIsSafeCheck = pathIsSafe(foodPath, bm.Req.You, bm.GameBoard)
 				foodPath = reverseList(foodPath)
 			}
 
-			if len(foodPath) >= 2 && pathIsSafeCheck {
+			if len(foodPath) >= 2 && pathIsSafeCheck && bm.Req.You.Health < 80 {
 				foodMove = foodPath[1]
 			}
 		}
@@ -67,16 +67,16 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	}()
 
 	go func() {
-		tailMove := Point{-1, -1}
+		tailMove := Coord{-1, -1}
 		copy := bm.GameBoard.copy()
 		copy.insert(bm.Req.You.Tail(), food())
 		tailPath := shortestPath(bm.OurHead, bm.Req.You.Tail(), copy)
-		if len(tailPath) >= 2 && bm.Req.You.Length > 2 {
+		if len(tailPath) >= 2 && len(bm.Req.You.Body) > 2 {
 			if len(tailPath) == 2 && bm.Req.You.Health > 99 {
-				tailMove = Point{-1, -1}
+				tailMove = Coord{-1, -1}
 			} else {
 				if bm.Req.Turn > 5 {
-					extendPath := extendPath(tailPath, *bm.GameBoard, 15)
+					extendPath := extendPath(tailPath, *bm.GameBoard, 25)
 					tailMove = extendPath[1]
 				} else {
 					tailMove = tailPath[1]
@@ -90,7 +90,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 	go func() {
 		root := createRoot(data)
 		currentMove := NO_MOVE
-		if bm.Req.You.Length >= 2 {
+		if len(bm.Req.You.Body) >= 2 {
 			currentMove = root.getOptimalMove()
 		}
 		optimalChannel <- currentMove

@@ -15,7 +15,7 @@ func abs(num int) int {
 	return num
 }
 
-func pointInSet(p Point, s []Point) bool {
+func pointInSet(p Coord, s []Coord) bool {
 	for i := 0; i < len(s); i++ {
 		if p.X == s[i].X && p.Y == s[i].Y {
 			return true
@@ -25,12 +25,12 @@ func pointInSet(p Point, s []Point) bool {
 	return false
 }
 
-func distance(p1 Point, p2 Point) int {
+func distance(p1 Coord, p2 Coord) int {
 	return abs(p1.X-p2.X) + abs(p1.Y-p2.Y)
 }
 
-func reconstructPath(current Point, pathMap map[Point]Point) []Point {
-	path := make([]Point, 0)
+func reconstructPath(current Coord, pathMap map[Coord]Coord) []Coord {
+	path := make([]Coord, 0)
 	path = append(path, current)
 
 	_, exists := pathMap[current]
@@ -43,9 +43,9 @@ func reconstructPath(current Point, pathMap map[Point]Point) []Point {
 	return reverseList(path)
 }
 
-func projectSnakeAlongPath(path []Point, snake Snake) []Point {
+func projectSnakeAlongPath(path []Coord, snake Snake) []Coord {
 	if len(path) < len(snake.Body) {
-		p := make([]Point, 0)
+		p := make([]Coord, 0)
 		p = append(p, path[:len(path)]...)
 		p = append(p, snake.Body[:(len(snake.Body)-len(path))+1]...)
 		return p
@@ -56,7 +56,7 @@ func projectSnakeAlongPath(path []Point, snake Snake) []Point {
 	return path
 }
 
-func pathIsSafe(path []Point, ourSnake Snake, b *Board) bool {
+func pathIsSafe(path []Coord, ourSnake Snake, b *Board) bool {
 	path = reverseList(path)
 	if len(path) < 2 {
 		return false
@@ -84,7 +84,7 @@ func pathIsSafe(path []Point, ourSnake Snake, b *Board) bool {
 	return false
 }
 
-func reverseList(lst []Point) []Point {
+func reverseList(lst []Coord) []Coord {
 	for i := 0; i < len(lst)/2; i++ {
 		j := len(lst) - i - 1
 		lst[i], lst[j] = lst[j], lst[i]
@@ -92,7 +92,7 @@ func reverseList(lst []Point) []Point {
 	return lst
 }
 
-func getDirection(from Point, to Point) string {
+func getDirection(from Coord, to Coord) string {
 	vertical := to.Y - from.Y
 	horizontal := to.X - from.X
 	if vertical == 0 {
@@ -107,40 +107,40 @@ func getDirection(from Point, to Point) string {
 	return DOWN
 }
 
-func pairIsValidExtension(p1 Point, p2 Point, board Board, path []Point) bool {
+func pairIsValidExtension(p1 Coord, p2 Coord, board Board, path []Coord) bool {
 	return pointIsValidExtension(p1, board, path) && pointIsValidExtension(p2, board, path)
 }
 
-func pointIsValidExtension(p Point, board Board, path []Point) bool {
+func pointIsValidExtension(p Coord, board Board, path []Coord) bool {
 	return !board.getTile(p).Dangerous && !pointInSet(p, path)
 }
 
-func extendPath(path []Point, board Board, limit int) []Point {
-	extended := make([]Point, 0)
+func extendPath(path []Coord, board Board, limit int) []Coord {
+	extended := make([]Coord, 0)
 	extended = append(extended, path...)
 	for i := 0; i < len(extended)-1; i++ {
 		current := extended[i]
 		next := extended[i+1]
 		direction := getDirection(current, next)
 		if direction == RIGHT || direction == LEFT {
-			currentUp := Point{current.X, current.Y - 1}
-			currentDown := Point{current.X, current.Y + 1}
-			nextUp := Point{next.X, next.Y - 1}
-			nextDown := Point{next.X, next.Y + 1}
+			currentUp := Coord{current.X, current.Y - 1}
+			currentDown := Coord{current.X, current.Y + 1}
+			nextUp := Coord{next.X, next.Y - 1}
+			nextDown := Coord{next.X, next.Y + 1}
 			if pairIsValidExtension(currentUp, nextUp, board, extended) {
-				extended = append(extended[0:i+1], append([]Point{currentUp, nextUp}, extended[i+1:]...)...)
+				extended = append(extended[0:i+1], append([]Coord{currentUp, nextUp}, extended[i+1:]...)...)
 			} else if pairIsValidExtension(currentDown, nextDown, board, extended) {
-				extended = append(extended[0:i+1], append([]Point{currentDown, nextDown}, extended[i+1:]...)...)
+				extended = append(extended[0:i+1], append([]Coord{currentDown, nextDown}, extended[i+1:]...)...)
 			}
 		} else if direction == UP || direction == DOWN {
-			currentLeft := Point{current.X - 1, current.Y}
-			currentRight := Point{current.X + 1, current.Y}
-			nextLeft := Point{next.X - 1, next.Y}
-			nextRight := Point{next.X + 1, next.Y}
+			currentLeft := Coord{current.X - 1, current.Y}
+			currentRight := Coord{current.X + 1, current.Y}
+			nextLeft := Coord{next.X - 1, next.Y}
+			nextRight := Coord{next.X + 1, next.Y}
 			if pairIsValidExtension(currentLeft, nextLeft, board, extended) {
-				extended = append(extended[0:i+1], append([]Point{currentLeft, nextLeft}, extended[i+1:]...)...)
+				extended = append(extended[0:i+1], append([]Coord{currentLeft, nextLeft}, extended[i+1:]...)...)
 			} else if pairIsValidExtension(currentRight, nextRight, board, extended) {
-				extended = append(extended[0:i+1], append([]Point{currentRight, nextRight}, extended[i+1:]...)...)
+				extended = append(extended[0:i+1], append([]Coord{currentRight, nextRight}, extended[i+1:]...)...)
 			}
 		}
 		if i == len(extended)-1 || len(extended) > limit {
@@ -151,18 +151,18 @@ func extendPath(path []Point, board Board, limit int) []Point {
 }
 
 // Find the shortest path from start -> goal
-func shortestPath(start Point, goal Point, board *Board) []Point {
-	closedSet := make([]Point, 0)    // Tiles already explored
-	openSet := make([]Point, 0)      // Tiles to explore
+func shortestPath(start Coord, goal Coord, board *Board) []Coord {
+	closedSet := make([]Coord, 0)    // Tiles already explored
+	openSet := make([]Coord, 0)      // Tiles to explore
 	openSet = append(openSet, start) // Start exploring from start tile
 
-	gScore := make(map[Point]float32) // Shortest path distance
-	fScore := make(map[Point]float32) // Manhatten distance heuristic
-	cameFrom := make(map[Point]Point)
+	gScore := make(map[Coord]float32) // Shortest path distance
+	fScore := make(map[Coord]float32) // Manhatten distance heuristic
+	cameFrom := make(map[Coord]Coord)
 	for i := 0; i < board.Width; i++ {
 		for j := 0; j < board.Height; j++ {
-			gScore[Point{i, j}] = 1000.0
-			fScore[Point{i, j}] = 1000.0
+			gScore[Coord{i, j}] = 1000.0
+			fScore[Coord{i, j}] = 1000.0
 		}
 	}
 	gScore[start] = 0
@@ -235,37 +235,37 @@ func Round(val float64, roundOn float64, places int) (newVal float64) {
 	return
 }
 
-func getKillIncentive(direction string, head Point) []Point {
+func getKillIncentive(direction string, head Coord) []Coord {
 	switch direction {
 	case UP:
-		return []Point{
-			Point{head.X - 1, head.Y - 1},
-			Point{head.X, head.Y - 1},
-			Point{head.X + 1, head.Y - 1},
+		return []Coord{
+			Coord{head.X - 1, head.Y - 1},
+			Coord{head.X, head.Y - 1},
+			Coord{head.X + 1, head.Y - 1},
 		}
 	case LEFT:
-		return []Point{
-			Point{head.X - 1, head.Y - 1},
-			Point{head.X - 1, head.Y},
-			Point{head.X - 1, head.Y + 1},
+		return []Coord{
+			Coord{head.X - 1, head.Y - 1},
+			Coord{head.X - 1, head.Y},
+			Coord{head.X - 1, head.Y + 1},
 		}
 	case DOWN:
-		return []Point{
-			Point{head.X - 1, head.Y + 1},
-			Point{head.X, head.Y + 1},
-			Point{head.X + 1, head.Y + 1},
+		return []Coord{
+			Coord{head.X - 1, head.Y + 1},
+			Coord{head.X, head.Y + 1},
+			Coord{head.X + 1, head.Y + 1},
 		}
 	case RIGHT:
-		return []Point{
-			Point{head.X + 1, head.Y - 1},
-			Point{head.X + 1, head.Y},
-			Point{head.X + 1, head.Y + 1},
+		return []Coord{
+			Coord{head.X + 1, head.Y - 1},
+			Coord{head.X + 1, head.Y},
+			Coord{head.X + 1, head.Y + 1},
 		}
 	default:
-		return []Point{
-			Point{head.X - 1, head.Y - 1},
-			Point{head.X, head.Y - 1},
-			Point{head.X + 1, head.Y - 1},
+		return []Coord{
+			Coord{head.X - 1, head.Y - 1},
+			Coord{head.X, head.Y - 1},
+			Coord{head.X + 1, head.Y - 1},
 		}
 	}
 }

@@ -12,22 +12,22 @@ const (
 type BoardManager struct {
 	GameBoard *Board
 	Req       *MoveRequest
-	OurHead   Point
+	OurHead   Coord
 }
 
 // Fill the board in based on JSON from request
 func initializeBoard(req *MoveRequest) *BoardManager {
 	bm := new(BoardManager)
 	bm.Req = req
-	bm.GameBoard = createBoard(req.Width, req.Height)
-	bm.addFood(req.Food)
-	bm.OurHead = bm.addSnakes(req.Snakes, req.You.ID)
+	bm.GameBoard = createBoard(req.Board.Width, req.Board.Height)
+	bm.addFood(req.Board.Food)
+	bm.OurHead = bm.addSnakes(req.Board.Snakes, req.You.ID)
 
 	return bm
 }
 
 // Add the food from the JSON
-func (bm BoardManager) addFood(foodPoint []Point) {
+func (bm BoardManager) addFood(foodPoint []Coord) {
 	for _, element := range foodPoint {
 		bm.GameBoard.insert(element, food())
 	}
@@ -35,14 +35,14 @@ func (bm BoardManager) addFood(foodPoint []Point) {
 
 func (bm BoardManager) avgSnakeLength() float64 {
 	avg := 0.0
-	for _, snake := range bm.Req.Snakes {
+	for _, snake := range bm.Req.Board.Snakes {
 		avg += float64(len(snake.Body))
 	}
-	return avg / float64(len(bm.Req.Snakes))
+	return avg / float64(len(bm.Req.Board.Snakes))
 }
 
 // Add our snake and the opposing snakes - with heuristic tiles
-func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
+func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Coord {
 	// Add each snake body segment
 	for _, snake := range snakePoint {
 		for _, snakeBody := range snake.Body {
@@ -50,35 +50,35 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 		}
 	}
 
-	ourHead := Point{}
+	ourHead := Coord{}
 
 	for _, snake := range snakePoint {
 		if snake.ID == you {
 			bm.GameBoard.insert(snake.Head(), snakeHead())
 			ourHead = snake.Head()
 		} else {
-			if snake.Length > 2 {
-				if distance(snake.Head(), bm.Req.You.Head()) < 5 && snake.Length >= bm.Req.You.Length {
+			if len(snake.Body) > 2 {
+				if distance(snake.Head(), bm.Req.You.Head()) < 5 && len(snake.Body) >= len(bm.Req.You.Body) {
 					potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
 					for k, p := range potential {
 						if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType != SNAKEHEAD {
 							bm.GameBoard.insert(p, obstacle())
-							if pointInSet(p, bm.Req.Food) && len(bm.Req.Food) > 1 {
-								bm.Req.Food = append(bm.Req.Food[:k], bm.Req.Food[k+1:]...)
+							if pointInSet(p, bm.Req.Board.Food) && len(bm.Req.Board.Food) > 1 {
+								bm.Req.Board.Food = append(bm.Req.Board.Food[:k], bm.Req.Board.Food[k+1:]...)
 							}
 						}
 					}
 				}
 			} else {
-				if snake.Length > 2 {
+				if len(snake.Body) > 2 {
 					potential := getKillIncentive(getDirection(snake.Body[1], snake.Head()), snake.Head())
 					bm.GameBoard.insert(snake.Head(), obstacle())
-					bm.Req.Food = append(bm.Req.Food, snake.Head())
+					bm.Req.Board.Food = append(bm.Req.Board.Food, snake.Head())
 					for _, p := range potential {
 						if (bm.GameBoard.tileInBounds(p)) && bm.GameBoard.getTile(p).EntityType == EMPTY {
 							bm.GameBoard.insert(p, food())
-							if !pointInSet(p, bm.Req.Food) {
-								bm.Req.Food = append(bm.Req.Food, p)
+							if !pointInSet(p, bm.Req.Board.Food) {
+								bm.Req.Board.Food = append(bm.Req.Board.Food, p)
 							}
 						}
 					}
@@ -96,17 +96,17 @@ func (bm BoardManager) addSnakes(snakePoint []Snake, you string) Point {
 
 type BestFoodResult struct {
 	Differential int
-	Food         Point
+	Food         Coord
 }
 
 // Find the best food, the one we are closest
 // to compared to all other snakes
 func (bm BoardManager) findBestFood() BestFoodResult {
-	best := make(map[Point]Point)
-	differential := make(map[Point]int) // how much closer the person is than all other snakes
-	for _, food := range bm.Req.Food {
+	best := make(map[Coord]Coord)
+	differential := make(map[Coord]int) // how much closer the person is than all other snakes
+	for _, food := range bm.Req.Board.Food {
 		if distance(food, bm.OurHead) < bm.Req.You.Health {
-			for _, snake := range bm.Req.Snakes {
+			for _, snake := range bm.Req.Board.Snakes {
 				_, exists := best[food]
 				if exists == true {
 					if distance(best[food], food) > distance(snake.Head(), food) && (best[food] != food) {
@@ -121,7 +121,7 @@ func (bm BoardManager) findBestFood() BestFoodResult {
 		}
 	}
 
-	bestFood := BestFoodResult{0, Point{-1, -1}}
+	bestFood := BestFoodResult{0, Coord{-1, -1}}
 	for food := range best {
 		if best[food] == bm.OurHead {
 			if bestFood.Food.X == -1 {

@@ -9,6 +9,8 @@ import (
 func main() {
 	http.HandleFunc("/start", handleStart)
 	http.HandleFunc("/move", handleMove)
+	http.HandleFunc("/ping", handleStart)
+	http.HandleFunc("/end", handleStart)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"

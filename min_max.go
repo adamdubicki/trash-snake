@@ -4,18 +4,18 @@ package main
 type MinMax struct {
 	Width  int
 	Height int
-	Snakes map[string][]Point
+	Snakes map[string][]Coord
 	YouID  string
 }
 
 func createRoot(req *MoveRequest) MinMax {
-	root := MinMax{0, 0, make(map[string][]Point), req.You.ID}
-	for _, snake := range req.Snakes {
-		newBody := append([]Point{}, snake.Body[:len(snake.Body)]...)
+	root := MinMax{0, 0, make(map[string][]Coord), req.You.ID}
+	for _, snake := range req.Board.Snakes {
+		newBody := append([]Coord{}, snake.Body[:len(snake.Body)]...)
 		root.Snakes[snake.ID] = newBody
 	}
-	root.Height = req.Height
-	root.Width = req.Width
+	root.Height = req.Board.Height
+	root.Width = req.Board.Height
 	return root
 }
 
@@ -102,7 +102,7 @@ func (m MinMax) generatePermutations(id string) []MinMax {
 	permuations := make([]MinMax, 0)
 	for _, n := range neighbours {
 		permutation := m.copy()
-		permutation.Snakes[id] = append([]Point{n}, permutation.Snakes[id][:len(permutation.Snakes[id])-1]...)
+		permutation.Snakes[id] = append([]Coord{n}, permutation.Snakes[id][:len(permutation.Snakes[id])-1]...)
 		permuations = append([]MinMax{permutation}, permuations...)
 	}
 
@@ -110,7 +110,7 @@ func (m MinMax) generatePermutations(id string) []MinMax {
 }
 
 func (m MinMax) copy() MinMax {
-	new := MinMax{m.Width, m.Height, make(map[string][]Point), m.YouID}
+	new := MinMax{m.Width, m.Height, make(map[string][]Coord), m.YouID}
 	for k, v := range m.Snakes {
 		new.Snakes[k] = v
 	}

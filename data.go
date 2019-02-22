@@ -25,15 +25,39 @@ type StartResponse struct {
 	SecondaryColor string   `json:"secondary_color,omitempty"`
 }
 
-type MoveRequest struct {
-	Food   PointList `json:"food"`
-	Height int       `json:"height"`
-	ID     int       `json:"id"`
-	Snakes SnakeList `json:"snakes"`
-	Turn   int       `json:"turn"`
-	Width  int       `json:"width"`
-	You    Snake     `json:"you"`
+type Game struct {
+	ID string `json:"id"`
 }
+
+type Board struct {
+	Height int     `json:"height"`
+	Width  int     `json:"width"`
+	Food   []Coord `json:"food"`
+	Snakes []Snake `json:"snakes"`
+	Grid   [][]entity
+}
+
+type MoveRequest struct {
+	Game  Game  `json:"game"`
+	Turn  int   `json:"turn"`
+	Board Board `json:"board"`
+	You   Snake `json:"you"`
+}
+
+type Coord struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
+// Snake - Destructured Snake object for request
+type Snake struct {
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Health int     `json:"health"`
+	Body   []Coord `json:"body"`
+}
+
+// Board - Destructured Board object for reques
 
 func NewMoveRequest(req *http.Request) (*MoveRequest, error) {
 	decoded := MoveRequest{}
@@ -45,21 +69,7 @@ type MoveResponse struct {
 	Move string `json:"move"`
 }
 
-type Snake struct {
-	Body   PointList `json:"body"`
-	Health int       `json:"health"`
-	ID     string    `json:"id"`
-	Length int       `json:"length"`
-	Name   string    `json:"name"`
-	Taunt  string    `json:"taunt"`
-}
-
-func (snake Snake) Head() Point { return snake.Body[0] }
-
-type Point struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}
+func (snake Snake) Head() Coord { return snake.Body[0] }
 
 type HeadType string
 
@@ -90,12 +100,12 @@ const (
 	TAIL_SMALL_RATTLE = "small-rattle"
 )
 
-// Parses List<Point> into []Point
-type PointList []Point
+// Parses List<Coord> into []Coord
+type PointList []Coord
 
 func (list *PointList) UnmarshalJSON(data []byte) error {
 	var obj struct {
-		Data []Point `json:"data"`
+		Data []Coord `json:"data"`
 	}
 	if err := json.Unmarshal(data, &obj); err != nil {
 		return err
@@ -118,4 +128,4 @@ func (list *SnakeList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (snake Snake) Tail() Point { return snake.Body[len(snake.Body)-1] }
+func (snake Snake) Tail() Coord { return snake.Body[len(snake.Body)-1] }

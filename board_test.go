@@ -56,14 +56,14 @@ func TestYInBounds(t *testing.T) {
 
 func TestGetTile(t *testing.T) {
 	b := createBoard(3, 4)
-	b.insert(Point{1, 2}, obstacle())
+	b.insert(Coord{1, 2}, obstacle())
 	tables := []struct {
-		p Point
+		p Coord
 		e int
 	}{
-		{Point{0, 0}, empty().EntityType},
-		{Point{-1, -1}, invalid().EntityType},
-		{Point{1, 2}, obstacle().EntityType},
+		{Coord{0, 0}, empty().EntityType},
+		{Coord{-1, -1}, invalid().EntityType},
+		{Coord{1, 2}, obstacle().EntityType},
 	}
 	for _, table := range tables {
 		tileEntity := b.getTile(table.p)

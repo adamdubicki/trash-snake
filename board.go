@@ -5,12 +5,6 @@ import (
 	"strings"
 )
 
-type Board struct {
-	Width  int
-	Height int
-	Grid   [][]entity
-}
-
 // Create a width x height board
 func createBoard(width int, height int) *Board {
 	b := new(Board)
@@ -50,7 +44,7 @@ func (b Board) yInBounds(ypos int) bool {
 }
 
 // Return what is in the grid at point p
-func (b Board) getTile(p Point) entity {
+func (b Board) getTile(p Coord) entity {
 	if b.tileInBounds(p) {
 		return b.Grid[p.Y][p.X]
 	}
@@ -58,23 +52,23 @@ func (b Board) getTile(p Point) entity {
 }
 
 // Return if a point p is in bounds
-func (b Board) tileInBounds(p Point) bool {
+func (b Board) tileInBounds(p Coord) bool {
 	return (b.xInBounds(p.X) && b.yInBounds(p.Y))
 }
 
-func (b Board) insert(p Point, e entity) {
+func (b Board) insert(p Coord, e entity) {
 	if b.xInBounds(p.X) && b.yInBounds(p.Y) {
 		b.Grid[p.Y][p.X] = e
 	}
 }
 
-func (b Board) getValidTiles(p Point) []Point {
-	validTiles := make([]Point, 0)
-	potential := []Point{
-		Point{p.X - 1, p.Y},
-		Point{p.X + 1, p.Y},
-		Point{p.X, p.Y - 1},
-		Point{p.X, p.Y + 1},
+func (b Board) getValidTiles(p Coord) []Coord {
+	validTiles := make([]Coord, 0)
+	potential := []Coord{
+		Coord{p.X - 1, p.Y},
+		Coord{p.X + 1, p.Y},
+		Coord{p.X, p.Y - 1},
+		Coord{p.X, p.Y + 1},
 	}
 	for i, p := range potential {
 		if b.tileInBounds(p) && b.getTile(p).EntityType != OBSTACLE {
