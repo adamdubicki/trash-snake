@@ -9,7 +9,7 @@ import (
 func main() {
 	http.HandleFunc("/start", handleStart)
 	http.HandleFunc("/move", handleMove)
-	http.HandleFunc("/ping", handleStart)
+	http.HandleFunc("/ping", handlePing)
 	http.HandleFunc("/end", handleStart)
 	port := os.Getenv("PORT")
 	if port == "" {

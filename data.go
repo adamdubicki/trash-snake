@@ -29,6 +29,8 @@ type Game struct {
 	ID string `json:"id"`
 }
 
+type EmptyResponse struct{}
+
 type Board struct {
 	Height int     `json:"height"`
 	Width  int     `json:"width"`

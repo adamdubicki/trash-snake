@@ -11,6 +11,10 @@ func respond(res http.ResponseWriter, obj interface{}) {
 	json.NewEncoder(res).Encode(obj)
 }
 
+func handlePing(res http.ResponseWriter, req *http.Request) {
+	respond(res, EmptyResponse{})
+}
+
 func handleStart(res http.ResponseWriter, req *http.Request) {
 	respond(res, StartResponse{
 		Color:          "orange",
