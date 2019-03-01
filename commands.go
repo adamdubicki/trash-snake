@@ -63,7 +63,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 				foodPath = reverseList(foodPath)
 			}
 
-			if len(foodPath) >= 2 && pathIsSafeCheck && bm.Req.You.Health < 80 {
+			if len(foodPath) >= 2 && pathIsSafeCheck { // here
 				foodMove = foodPath[1]
 			}
 		}
@@ -80,7 +80,7 @@ func handleMove(res http.ResponseWriter, req *http.Request) {
 				tailMove = Coord{-1, -1}
 			} else {
 				if bm.Req.Turn > 5 {
-					extendPath := extendPath(tailPath, *bm.GameBoard, 25)
+					extendPath := extendPath(tailPath, *bm.GameBoard, 50)
 					tailMove = extendPath[1]
 				} else {
 					tailMove = tailPath[1]
